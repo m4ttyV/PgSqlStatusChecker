@@ -46,6 +46,8 @@ namespace ConsoleApp2
             string Username = "";
             string Password = "";
             string status = DateTime.UtcNow.ToString();
+            if (!Directory.Exists(@"C:\Users\glebm\source\repos\ConsoleApp2\ConsoleApp2\bin\Debug\net8.0\Logs"))
+                Console.WriteLine("1");
             try
             {
                 Directory.CreateDirectory("./Output");
@@ -76,8 +78,7 @@ namespace ConsoleApp2
             catch (Exception ex)
             {
                 Console.WriteLine($"В ходе получения данных для подключения к базе данных возникла ошибка: {ex.Message}\n " +
-                    $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате \"hostname;port;username;password\"");
-                Console.ReadKey();
+                    $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате \"hostname;port;username;password\"");                
                 return;
             }
             string connectionString = $"Host={Hostname};Port={Port};Username={Username};Password={Password}";
@@ -141,8 +142,7 @@ namespace ConsoleApp2
                 catch (Exception ex)
                 {
                     logRow = $"Error;{DateTime.UtcNow.ToString()};{tableName};{ex.Message}";
-                    outputRow = ex.Message;
-                    Console.ReadKey();
+                    outputRow = ex.Message;                    
                 }
                 Logs.Add(logRow);
                 Output.Add($"{tableName};{outputRow}");
@@ -153,19 +153,21 @@ namespace ConsoleApp2
             {
                 foreach (var str in Output)
                 {
-                    if (!File.Exists("./Output/" + str.Split(';')[0] + ".txt"))
+                    string file_name = str.Split(';')[0];
+                    string data = str.Split(';')[1];
+                    if (!File.Exists("./Output/" + file_name + ".txt"))
                     {
-                        using (FileStream fs = File.Create("./Output/" + str.Split(';')[0] + ".txt"))
+                        using (FileStream fs = File.Create("./Output/" + file_name + ".txt"))
                         {
-                            byte[] info = new UTF8Encoding(true).GetBytes(str.Split(';')[1]);
+                            byte[] info = new UTF8Encoding(true).GetBytes(data);
                             fs.Write(info, 0, info.Length);
                         }
                     }
                     else
                     {
-                        using (StreamWriter writer = new StreamWriter("./Output/" + str.Split(';')[0] + ".txt"))
+                        using (StreamWriter writer = new StreamWriter("./Output/" + file_name + ".txt"))
                         {
-                            writer.WriteLine(str.Split(';')[1]);
+                            writer.WriteLine(data);
                         }
                     }
                 }
@@ -219,7 +221,7 @@ namespace ConsoleApp2
                     writer.WriteLine(status + "|" + ex.Message);
                 }
 
-                Console.ReadKey();
+                
             }
             Console.WriteLine("Готово!");
         }
