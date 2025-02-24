@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Text;
-using Npgsql;
-using Npgsql.Internal;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using Npgsql;
 
 namespace ConsoleApp2
 {
@@ -206,9 +201,7 @@ namespace ConsoleApp2
                 using (StreamWriter writer = new StreamWriter("./Status.txt"))
                 {
                     writer.WriteLine(status + "|" + ex.Message);
-                }
-
-                
+                }                
             }
             Console.WriteLine("Готово!");
         }
