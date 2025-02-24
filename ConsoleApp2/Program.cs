@@ -143,6 +143,14 @@ namespace ConsoleApp2
                     }
                 }
             }
+            if (tables.Count == 0)
+            {
+                Console.WriteLine("Таблиц не найдено. Проверьте файл \"table_names.txt\".\n" +
+                    "Наименования таблиц должны храниться  в формате: имя_таблицы;колонка_с_датами.\n" +
+                    "\"колонка_с_датами\" - не обязательна. Значение по умолчанию: m4400.");
+                return;
+
+            }
             for (int i = 0; i < tables.Count; i++)
             {
                 string tableName = tables[i].Split(';')[0];
