@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using Npgsql;
 using Npgsql.Internal;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ConsoleApp2
 {
@@ -46,17 +47,11 @@ namespace ConsoleApp2
             string Username = "";
             string Password = "";
             string status = DateTime.UtcNow.ToString();
-            if (!Directory.Exists(@"C:\Users\glebm\source\repos\ConsoleApp2\ConsoleApp2\bin\Debug\net8.0\Logs"))
-                Console.WriteLine("1");
-            try
-            {
-                Directory.CreateDirectory("./Output");
-            }
-            catch { }
-            try {
+            string ProgramPath = Environment.CurrentDirectory;
+            if (!Directory.Exists(ProgramPath + "/Logs"))
                 Directory.CreateDirectory("./Logs");
-            }
-            catch { }
+            if (!Directory.Exists(ProgramPath + "/Output"))
+                Directory.CreateDirectory("./Output");
             try
             {
                 using (StreamReader reader = new StreamReader("./database_conf.cfg"))
@@ -68,17 +63,39 @@ namespace ConsoleApp2
                             continue;
                         if (line.StartsWith('#'))
                             continue;
-                        Hostname = line.Split(';')[0];
-                        Port = line.Split(';')[1];
-                        Username = line.Split(';')[2];
-                        Password = line.Split(';')[3];
+                        if (Hostname == "")
+                        { 
+                            Hostname = line;
+                            continue;
+                        }
+                        if (Port == "")
+                        {
+                            Port = line;
+                            continue;
+                        }
+                        if (Username == "")
+                        {
+                            Username = line;
+                            continue;
+                        }
+                        if (Password == "")
+                        {
+                            Password = line;
+                            continue;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"В ходе получения данных для подключения к базе данных возникла ошибка: {ex.Message}\n " +
-                    $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате \"hostname;port;username;password\"");                
+                    $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате:\n \"hostname\nport\nusername\npassword\"");                
+                return;
+            }
+            if (Hostname == "" || Port == "" || Username == "" || Password == "")
+            {
+                Console.WriteLine($"В ходе получения данных для подключения к базе данных возникла ошибка:\n" +
+                    $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате:\nhostname\nport\nusername\npassword");
                 return;
             }
             string connectionString = $"Host={Hostname};Port={Port};Username={Username};Password={Password}";
@@ -132,7 +149,7 @@ namespace ConsoleApp2
                 string columnName = tables[i].Split(';')[1];
                 string outputRow = "";
                 string logRow = "";
-                //пишем логи
+                //пишем логи и вывод
                 try
                 {
                     string dateRow = db.GetColumnValues(db.GetConnection(), tableName, columnName);
@@ -155,59 +172,21 @@ namespace ConsoleApp2
                 {
                     string file_name = str.Split(';')[0];
                     string data = str.Split(';')[1];
-                    if (!File.Exists("./Output/" + file_name + ".txt"))
+                    using (StreamWriter writer = new StreamWriter("./Output/" + file_name + ".txt"))
                     {
-                        using (FileStream fs = File.Create("./Output/" + file_name + ".txt"))
-                        {
-                            byte[] info = new UTF8Encoding(true).GetBytes(data);
-                            fs.Write(info, 0, info.Length);
-                        }
-                    }
-                    else
-                    {
-                        using (StreamWriter writer = new StreamWriter("./Output/" + file_name + ".txt"))
-                        {
-                            writer.WriteLine(data);
-                        }
+                        writer.WriteLine(data);
                     }
                 }
-
-                if (!File.Exists("./Logs/Log-" + DateOnly.FromDateTime(DateTime.UtcNow) + ".txt"))
+                using (StreamWriter writer = new StreamWriter("./Logs/Log-" + DateOnly.FromDateTime(DateTime.UtcNow) + ".txt", true))
                 {
-                    using (FileStream fs = File.Create("./Logs/Log-" + DateOnly.FromDateTime(DateTime.UtcNow) + ".txt"))
+                    foreach (var str in Logs)
                     {
-                        foreach (var str in Logs)
-                        {
-                            byte[] info = new UTF8Encoding(true).GetBytes(str + "\t\n");
-                            fs.Write(info, 0, info.Length);
-                        }
+                        writer.WriteLine(str);
                     }
                 }
-                else
+                using (StreamWriter writer = new StreamWriter("./Status.txt"))
                 {
-                    using (StreamWriter writer = new StreamWriter("./Logs/Log-" + DateOnly.FromDateTime(DateTime.UtcNow) + ".txt", true))
-                    {
-                        foreach (var str in Logs)
-                        {
-                            writer.WriteLine(str);
-                        }
-                    }
-                }
-
-                if (!File.Exists("./Status.txt"))
-                {
-                    using (FileStream fs = File.Create("./Status.txt"))
-                    {
-                        byte[] info = new UTF8Encoding(true).GetBytes(status);
-                        fs.Write(info, 0, info.Length);
-                    }
-                }
-                else
-                {
-                    using (StreamWriter writer = new StreamWriter("./Status.txt"))
-                    {
-                        writer.WriteLine(status);
-                    }
+                    writer.WriteLine(status);
                 }
             }
             catch (Exception ex)
