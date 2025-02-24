@@ -78,6 +78,7 @@ namespace ConsoleApp2
                 Console.WriteLine($"В ходе получения данных для подключения к базе данных возникла ошибка: {ex.Message}\n " +
                     $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате \"hostname;port;username;password\"");
                 Console.ReadKey();
+                return;
             }
             string connectionString = $"Host={Hostname};Port={Port};Username={Username};Password={Password}";
             List<string> Output = new List<string>();
