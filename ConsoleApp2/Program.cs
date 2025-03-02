@@ -97,20 +97,26 @@ namespace ConsoleApp2
             List<string> Output = new List<string>();
             List<string> Logs = new List<string>();
             NpgsqlDbHelper db = new NpgsqlDbHelper(connectionString);
-
-            using (var conn = new NpgsqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                using (var cmd =  new NpgsqlCommand("SELECT version();", conn))
+                using (var conn = new NpgsqlConnection(connectionString))
                 {
-                    var version = cmd.ExecuteScalar();
-                    Console.WriteLine($"Подключение к базе данных: Успех!\n" +
-                        $" Версия PostgreSQL:{version}\n" +
-                        $"Получаем данные...");
+                    conn.Open();
+                    using (var cmd = new NpgsqlCommand("SELECT version();", conn))
+                    {
+                        var version = cmd.ExecuteScalar();
+                        Console.WriteLine($"Подключение к базе данных: Успех!\n" +
+                            $" Версия PostgreSQL:{version}\n" +
+                            $"Получаем данные...");
+                    }
+                    conn.Close();
                 }
-                conn.Close();
+            }            
+            catch
+            {
+                Console.WriteLine("Ошибка подключения к базе данных. Проверьте данные для подключения в файле \"database_conf.cfg\".");
+                return;
             }
-
             string def_column = "m4400";
             string tableListFilePath = "./table_names.txt";
             List<string> tables = new List<string>();
