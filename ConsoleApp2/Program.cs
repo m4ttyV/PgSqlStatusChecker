@@ -84,7 +84,7 @@ namespace ConsoleApp2
             catch (Exception ex)
             {
                 Console.WriteLine($"В ходе получения данных для подключения к базе данных возникла ошибка: {ex.Message}\n " +
-                    $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате:\n \"hostname\nport\nusername\npassword\"");                
+                    $"Данные должны храниться в файле \"database_conf.cfg\" рядом с исполняемым файлом в формате:\n\"hostname\nport\nusername\npassword\"");                
                 return;
             }
             if (Hostname == "" || Port == "" || Username == "" || Password == "")
