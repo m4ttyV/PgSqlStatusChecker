@@ -42,6 +42,9 @@ namespace ConsoleApp2
             string Username = "";
             string Password = "";
             string status = DateTime.UtcNow.ToString();
+            string def_column = "m4400";
+            Console.WriteLine("Введите путь к файлу с названиями таблиц: ");
+            string tableListFilePath = Console.ReadLine().Trim('\"');
             string ProgramPath = Environment.CurrentDirectory;
             if (!Directory.Exists(ProgramPath + "/Logs"))
                 Directory.CreateDirectory("./Logs");
@@ -117,8 +120,6 @@ namespace ConsoleApp2
                 Console.WriteLine("Ошибка подключения к базе данных. Проверьте данные для подключения в файле \"database_conf.cfg\".");
                 return;
             }
-            string def_column = "m4400";
-            string tableListFilePath = "./table_names.txt";
             List<string> tables = new List<string>();
             using (StreamReader reader = new StreamReader(tableListFilePath))
             {
