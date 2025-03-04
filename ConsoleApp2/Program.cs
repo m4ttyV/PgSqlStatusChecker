@@ -187,7 +187,7 @@ namespace ConsoleApp2
                         writer.WriteLine(data);
                     }
                 }
-                using (StreamWriter writer = new StreamWriter("./Logs/Log-" + DateOnly.FromDateTime(DateTime.UtcNow) + ".txt", true))
+                using (StreamWriter writer = new StreamWriter("./Logs/Log-" + DateTime.UtcNow.ToString("dd-mm-yyyy") + ".txt", true))
                 {
                     foreach (var str in Logs)
                     {
